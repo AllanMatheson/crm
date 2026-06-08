@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Delete Opportunity</h2>
+<p>Are you sure you want to delete <strong>{{ opp.title }}</strong> ({{ opp.company }})?</p>
+<p>This cannot be undone.</p>
+
+<form method="POST">
+  <div class="form-actions">
+    <button type="submit" class="danger-btn">Yes, Delete</button>
+    <a href="{{ url_for('index') }}" role="button" class="secondary">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

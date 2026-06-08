@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Sales Pipeline</h2>
+
+<!-- Summary cards -->
+<div class="summary-cards">
+  <article>
+    <h3>{{ open_count }}</h3>
+    <p>Open Deals</p>
+  </article>
+  <article>
+    <h3>${{ "{:,.0f}".format(total_value) }}</h3>
+    <p>Pipeline Value</p>
+  </article>
+  <article>
+    <h3>${{ "{:,.0f}".format(won_value) }}</h3>
+    <p>Won This View</p>
+  </article>
+</div>
+
+<!-- Stage filter -->
+<div class="filter-bar">
+  <span>Filter by stage:</span>
+  <a href="{{ url_for('index') }}" {% if not stage_filter %}class="active"{% endif %}>All</a>
+  {% for s in stages %}
+    <a href="{{ url_for('index', stage=s) }}" class="stage-badge stage-{{ s|lower }} {% if stage_filter == s %}active{% endif %}">{{ s }}</a>
+  {% endfor %}
+</div>
+
+<!-- Opportunities table -->
+{% if opportunities %}
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Deal</th>
+        <th>Company</th>
+        <th>Contact</th>
+        <th>Value</th>
+        <th>Stage</th>
+        <th>Prob %</th>
+        <th>Close Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in opportunities %}
+      <tr {% if o.close_date and o.close_date < today and o.stage not in ('Won','Lost') %}class="overdue"{% endif %}>
+        <td><strong>{{ o.title }}</strong></td>
+        <td>{{ o.company }}</td>
+        <td>{{ o.contact_name or '—' }}</td>
+        <td>{% if o.value %}${{ "{:,.0f}".format(o.value) }}{% else %}—{% endif %}</td>
+        <td><span class="stage-badge stage-{{ o.stage|lower }}">{{ o.stage }}</span></td>
+        <td>{{ o.probability }}%</td>
+        <td>{% if o.close_date %}{{ o.close_date.strftime('%b %d, %Y') }}{% else %}—{% endif %}</td>
+        <td>
+          <a href="{{ url_for('edit_opportunity', id=o.id) }}">Edit</a> ·
+          <a href="{{ url_for('delete_opportunity', id=o.id) }}" class="danger-link">Delete</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p>No opportunities yet. <a href="{{ url_for('new_opportunity') }}">Add your first deal →</a></p>
+{% endif %}
+
+{% endblock %}

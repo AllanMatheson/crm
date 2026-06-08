@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>{% if opp %}Edit Opportunity{% else %}New Opportunity{% endif %}</h2>
+
+<form method="POST">
+  <div class="grid">
+    <label>Deal Title *
+      <input type="text" name="title" value="{{ opp.title if opp else '' }}" required>
+    </label>
+    <label>Company *
+      <input type="text" name="company" value="{{ opp.company if opp else '' }}" required>
+    </label>
+  </div>
+
+  <div class="grid">
+    <label>Contact Name
+      <input type="text" name="contact_name" value="{{ opp.contact_name if opp else '' }}">
+    </label>
+    <label>Contact Email
+      <input type="email" name="contact_email" value="{{ opp.contact_email if opp else '' }}">
+    </label>
+  </div>
+
+  <div class="grid">
+    <label>Deal Value ($)
+      <input type="number" name="value" step="0.01" value="{{ opp.value if opp and opp.value else '' }}">
+    </label>
+    <label>Close Date
+      <input type="date" name="close_date" value="{{ opp.close_date.strftime('%Y-%m-%d') if opp and opp.close_date else '' }}">
+    </label>
+  </div>
+
+  <div class="grid">
+    <label>Stage
+      <select name="stage" id="stage-select">
+        {% for s in stages %}
+          <option value="{{ s }}" {% if opp and opp.stage == s %}selected{% elif not opp and s == 'Lead' %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Probability (%)
+      <input type="number" name="probability" id="probability" min="0" max="100"
+             value="{{ opp.probability if opp else 10 }}">
+    </label>
+  </div>
+
+  <label>Notes
+    <textarea name="notes" rows="4">{{ opp.notes if opp else '' }}</textarea>
+  </label>
+
+  <div class="form-actions">
+    <button type="submit">{% if opp %}Save Changes{% else %}Create Opportunity{% endif %}</button>
+    <a href="{{ url_for('index') }}" role="button" class="secondary">Cancel</a>
+  </div>
+</form>
+
+<script>
+  const probs = {{ stage_probabilities | tojson }};
+  document.getElementById('stage-select').addEventListener('change', function() {
+    document.getElementById('probability').value = probs[this.value];
+  });
+</script>
+
+{% endblock %}
